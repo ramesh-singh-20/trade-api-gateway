@@ -1,0 +1,35 @@
+management:
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include:
+          - health
+          - info
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    hostname: localhost
+
+spring:
+  application:
+    name: TRADE-API-GATEWAY
+  cloud:
+    gateway:
+      routes:
+        - id: portfolio-internal-ms
+          uri: lb://PORTFOLIO-INTERNAL-MS
+          predicates:
+            - Path=/portfolio/**
+        - id: trade-internal-ms
+          uri: lb://TRADE-INTERNAL-MS
+          predicates:
+            - Path=/trade/**
+
+server:
+  port: 8989
