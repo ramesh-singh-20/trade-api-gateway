@@ -3,9 +3,10 @@ management:
     web:
       base-path: /
       exposure:
-        include:
-          - health
-          - info
+        include: '*'
+  health:
+    circuitbreakers:
+      enabled: true
 
 eureka:
   client:
@@ -26,10 +27,33 @@ spring:
           uri: lb://PORTFOLIO-INTERNAL-MS
           predicates:
             - Path=/portfolio/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: portfolioCircuitBreaker
+                fallbackUri: forward:/portfolio-fallback
         - id: trade-internal-ms
           uri: lb://TRADE-INTERNAL-MS
           predicates:
             - Path=/trade/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: tradeCircuitBreaker
+                fallbackUri: forward:/trade-fallback
 
 server:
   port: 8989
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      slidingWindowSize: 10
+      permittedNumberOfCallsInHalfOpenState: 3
+      waitDurationInOpenState: 20s
+      failureRateThreshold: 5
+
+resilience4j.timelimiter:
+  configs:
+    default:
+      timeoutDuration: 1s
