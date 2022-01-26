@@ -11,6 +11,8 @@ management:
 spring:
   application:
     name: TRADE-API-GATEWAY
+  config:
+    import: optional:configserver:${SPRING_CLOUD_CONFIG_URI:http://localhost:9196}
   cloud:
     gateway:
       routes:
